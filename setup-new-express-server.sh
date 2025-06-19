@@ -194,25 +194,52 @@ fi
 # Create a VirtualHost config file that proxies requests to node
 sudo touch /etc/apache2/sites-available/$DOMAIN_NAME.conf
 if echo "<VirtualHost *:80>
-	
     ServerName $DOMAIN_NAME
     ServerAlias www.$DOMAIN_NAME
     ServerAdmin $ADMIN_CONTACT
 
+    # Redirect HTTP to HTTPS
+    Redirect permanent / https://$DOMAIN_NAME/
+
+    ErrorLog /var/log/apache2/$DOMAIN_NAME-error.log
+    CustomLog /var/log/apache2/$DOMAIN_NAME-access.log combined
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName $DOMAIN_NAME
+    ServerAlias www.$DOMAIN_NAME
+    ServerAdmin $ADMIN_CONTACT
+
+    # SSL Configuration using Cloudflare Origin CA
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/cloudflare/fcc.lol.pem
+    SSLCertificateKeyFile /etc/ssl/cloudflare/fcc.lol.key
+    
+    # SSL Security Settings
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite ECDHE+AESGCM:ECDHE+AES256:ECDHE+AES128:!aNULL:!MD5:!DSS
+    SSLHonorCipherOrder on
+
+    # Proxy Configuration
     ProxyRequests Off
     ProxyPreserveHost On
     ProxyVia Full
     <Proxy *>
         Require all granted
     </Proxy>
+    
     ProxyPass / http://127.0.0.1:$PORT/
     ProxyPassReverse / http://127.0.0.1:$PORT/
 
-    ErrorLog /var/log/apache2/$DOMAIN_NAME-error.log
-    CustomLog /var/log/apache2/$DOMAIN_NAME-access.log combined
-	
+    ErrorLog /var/log/apache2/$DOMAIN_NAME-ssl-error.log
+    CustomLog /var/log/apache2/$DOMAIN_NAME-ssl-access.log combined
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$DOMAIN_NAME.conf > /dev/null; then
 	echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created Apache config file at /etc/apache2/sites-available/$DOMAIN_NAME.conf"
+	
+	# Enable SSL module if not already enabled
+	sudo a2enmod ssl
+	echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Enabled SSL module"
+	
 else
 	echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create Apache config file at /etc/apache2/sites-available/$DOMAIN_NAME.conf"
 fi
