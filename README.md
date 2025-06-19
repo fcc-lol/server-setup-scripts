@@ -10,9 +10,8 @@
 5. Optional: Pick PHP version
 6. Create a VirtualHost config file that points to the domain directory
 7. Reload Apache
-8. Optional: Generate SSL certificate from Let's Encrypt
-9. If Git, set up a hook that deploys any commits made to this repo 
-10. Optional: Set up a bare Git repository in the domain directory
+8. If Git, set up a hook that deploys any commits made to this repo 
+9. Optional: Set up a bare Git repository in the domain directory
 
 ## [setup-new-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-express-server.sh)
 #### Setup an Express server accessible from a Apache VirtualHost subdomain
@@ -28,11 +27,10 @@
 9. Create a VirtualHost config file that proxies requests to node
 10. Enable site in Apache
 11. Reload Apache
-12. Generate SSL certificate with Let's Encrypt
-13. Initialize Git repository
-14. Create basic gitignore file
-15. Commit basic code
-16. Set up a hook that deploys any commits made to this repo
+12. Initialize Git repository
+13. Create basic gitignore file
+14. Commit basic code
+15. Set up a hook that deploys any commits made to this repo
 
 ## [restart-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/restart-express-server.sh)
 #### Restart an Express server created by [setup-new-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-express-server.sh)
@@ -68,11 +66,10 @@
 11. Create a VirtualHost config file that points to the app's build directory
 12. Enable site in Apache
 13. Reload Apache
-14. Generate SSL certificate with Let's Encrypt
-15. Initialize Git repository
-16. Create basic gitignore file
-17. Commit basic code
-18. Set up a hook that deploys any commits made to this repo 
+14. Initialize Git repository
+15. Create basic gitignore file
+16. Commit basic code
+17. Set up a hook that deploys any commits made to this repo 
 
 ## [rebuild-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/rebuild-react-app.sh)
 #### Rebuild a React app created by [setup-new-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-react-app.sh)
