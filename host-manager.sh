@@ -185,10 +185,6 @@ display_remote_directory() {
                 echo "Removing Express Server: $selected_folder"
                 execute_ssh_command "bash $SCRIPTS_DIRECTORY/remove-express-server.sh --service-id $selected_folder" "true"
                 ;;
-            "Remove PHP/HTML Server")
-                echo "Removing PHP/HTML Server: $selected_folder"
-                execute_ssh_command "bash $SCRIPTS_DIRECTORY/remove-php-html-server.sh --domain-name $selected_folder" "true"
-                ;;
             "Rebuild React App")
                 echo "Rebuilding React App: $selected_folder"
                 execute_ssh_command "bash $SCRIPTS_DIRECTORY/rebuild-react-app.sh --app-id $selected_folder" "true"
@@ -213,7 +209,7 @@ while true; do
     elif [ $level1_selection -eq 0 ]; then
         while true; do
             # Level 2 (Set Up)
-            setup_options=("React App" "Express Server" "PHP/HTML Server")
+            setup_options=("React App" "Express Server")
             navigate_menu 2 "Create New Instance" "add" "${setup_options[@]}"
             setup_selection=$selected_option
             
@@ -237,7 +233,7 @@ while true; do
         while true; do
             # Level 2 (Remove)
             remove_options=("React App" "Express Server")
-            # remove_options=("React App" "Express Server" "PHP/HTML Server")
+            # remove_options=("React App" "Express Server")
             navigate_menu 2 "Remove Existing Instance" "remove" "${remove_options[@]}"
             remove_selection=$selected_option
             
@@ -257,12 +253,6 @@ while true; do
                             continue
                         fi
                         ;;
-                    2)
-                        # Level 3 (Remove PHP/HTML Server)
-                        if ! display_remote_directory 3 "$DOMAINS_DIRECTORY" "remove" "Remove PHP/HTML Server"; then
-                            continue
-                        fi
-                        ;;
                 esac
             fi
         done
@@ -270,7 +260,7 @@ while true; do
         while true; do
             # Level 2 (Remove)
             reload_options=("React App" "Express Server")
-            # remove_options=("React App" "Express Server" "PHP/HTML Server")
+            # remove_options=("React App" "Express Server")
             navigate_menu 2 "Reload Existing Instance" "reload" "${reload_options[@]}"
             reload_selection=$selected_option
             
