@@ -56,20 +56,20 @@
 2. Create src directory for app
 3. Create public directory for app
 4. Creates basic files in src/
-4. Creates basic files in public/
-5. Create a basic README.md
-6. Create a basic package.json
-7. Create a setup-log.json
-8. Change permissions for app directory to specified user
-9. Install node modules
-10. Build app for production
-11. Create a VirtualHost config file that points to the app's build directory
-12. Enable site in Apache
-13. Reload Apache
-14. Initialize Git repository
-15. Create basic gitignore file
-16. Commit basic code
-17. Set up a hook that deploys any commits made to this repo 
+5. Creates basic files in public/
+6. Create a basic README.md
+7. Create a basic package.json
+8. Create a setup-log.json
+9. Change permissions for app directory to specified user
+10. Install node modules
+11. Build app for production
+12. Create a VirtualHost config file that points to the app's build directory
+13. Enable site in Apache
+14. Reload Apache
+15. Initialize Git repository
+16. Create basic gitignore file
+17. Commit basic code
+18. Set up a hook that deploys any commits made to this repo 
 
 ## [rebuild-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/rebuild-react-app.sh)
 #### Rebuild a React app created by [setup-new-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-react-app.sh)
