@@ -331,14 +331,6 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot reload Apache"
 fi
 
-# Generate SSL certificate with Let's Encrypt
-echo "Generating certificate with Let's Encrypt for $DOMAIN_NAME"
-if sudo certbot --apache -d $DOMAIN_NAME,www.$DOMAIN_NAME; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Generated SSL certificate"
-else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot generate SSL certificate"
-fi
-
 # Initialize Git repository
 if cd $APPS_DIRECTORY/$APP_ID && \
     git init && \
