@@ -102,19 +102,6 @@ else
 	echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot reload Apache"
 fi
 
-# Optional: Generate SSL certificate from Let's Encrypt
-read -r -p "Do you want to setup HTTPS with Let's Encrypt? [y/N] " SSL_CERTIFICATE_SETUP
-if [[ "$SSL_CERTIFICATE_SETUP" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-	echo "Generating certificate with Let's Encrypt for $DOMAIN_NAME"
-	sudo certbot --apache -d $DOMAIN_NAME,www.$DOMAIN_NAME
-	
-	HTTPS="true"
-else
-	echo -e "${BOLD}PASSED${END_COLOR} Not setting up HTTPS for $DOMAIN_NAME"
-	
-	HTTPS="false"
-fi
-
 # Optional: Set up a bare Git repository in the domain directory
 read -r -p "Do you want to setup a Git repository for $DOMAIN_NAME? [y/N] " GIT_SETUP
 if [[ "$GIT_SETUP" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
