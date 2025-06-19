@@ -2,7 +2,7 @@
 
 # Set up variables
 USER="fcc"
-SERVER="208.113.164.255"
+SERVER="208.113.164.85"
 SCRIPTS_DIRECTORY="/home/$USER/scripts"
 APPS_DIRECTORY="/home/$USER/react-apps"
 SERVICES_DIRECTORY="/home/$USER/services"
