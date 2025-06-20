@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set up variables
-SERVER="208.113.164.85"
+SERVER="root.fcc.lol"
 USER="fcc"
 ADMIN_CONTACT="studio@fcc.lol"
 SERVICES_DIRECTORY="/home/$USER/services"
