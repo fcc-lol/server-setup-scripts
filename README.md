@@ -85,3 +85,41 @@
 2. Delete Apache config file
 3. Delete app directory
 5. Reload Apache
+
+## [setup-new-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+#### Setup a Vite app accessible from a Apache VirtualHost domain or subdomain
+
+1. Create root directory for app
+2. Create src directory for app
+3. Create public directory for app
+4. Creates basic files in src/ (main.js, App.vue, style.css)
+5. Creates basic files in public/ (vite.svg)
+6. Create a basic README.md
+7. Create a basic package.json
+8. Create a basic vite.config.js
+9. Create a setup-log.json
+10. Change permissions for app directory to specified user
+11. Install node modules
+12. Build app for production
+13. Create a VirtualHost config file that points to the app's dist directory
+14. Enable site in Apache
+15. Reload Apache
+16. Initialize Git repository
+17. Create basic gitignore file
+18. Commit basic code
+19. Set up a hook that deploys any commits made to this repo
+
+## [rebuild-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/rebuild-vite-app.sh)
+#### Rebuild a Vite app created by [setup-new-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+
+1. Install node modules
+2. Build app for production
+3. Reload Apache
+   
+## [remove-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/remove-vite-app.sh)
+#### Decommission a Vite app created by [setup-new-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+
+1. Disable site in Apache
+2. Delete Apache config file
+3. Delete app directory
+4. Reload Apache
