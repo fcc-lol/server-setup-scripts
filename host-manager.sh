@@ -5,6 +5,7 @@ USER="fcc"
 SERVER="root.fcc.lol"
 SCRIPTS_DIRECTORY="/home/$USER/scripts"
 APPS_DIRECTORY="/home/$USER/react-apps"
+VITE_APPS_DIRECTORY="/home/$USER/vite-apps"
 SERVICES_DIRECTORY="/home/$USER/services"
 DOMAINS_DIRECTORY="/home/$USER/domains"
 
@@ -186,6 +187,10 @@ display_remote_directory() {
                 echo "Removing React App: $selected_folder"
                 execute_ssh_command "bash $SCRIPTS_DIRECTORY/remove-react-app.sh --app-id $selected_folder" "true"
                 ;;
+            "Remove Vite React App")
+                echo "Removing Vite React App: $selected_folder"
+                execute_ssh_command "bash $SCRIPTS_DIRECTORY/remove-vite-app.sh --app-id $selected_folder" "true"
+                ;;
             "Remove Express Server")
                 echo "Removing Express Server: $selected_folder"
                 execute_ssh_command "bash $SCRIPTS_DIRECTORY/remove-express-server.sh --service-id $selected_folder" "true"
@@ -193,6 +198,10 @@ display_remote_directory() {
             "Rebuild React App")
                 echo "Rebuilding React App: $selected_folder"
                 execute_ssh_command "bash $SCRIPTS_DIRECTORY/rebuild-react-app.sh --app-id $selected_folder" "true"
+                ;;
+            "Rebuild Vite React App")
+                echo "Rebuilding Vite React App: $selected_folder"
+                execute_ssh_command "bash $SCRIPTS_DIRECTORY/rebuild-vite-app.sh --app-id $selected_folder" "true"
                 ;;
             "Restart Express Server")
                 echo "Restarting Express Server: $selected_folder"
@@ -287,7 +296,7 @@ while true; do
     elif [ $level1_selection -eq 0 ]; then
         while true; do
             # Level 2 (Set Up)
-            setup_options=("React App" "Express Server")
+            setup_options=("React App" "Vite React App" "Express Server")
             navigate_menu 2 "Create New Instance" "add" "${setup_options[@]}"
             setup_selection=$selected_option
             
@@ -299,10 +308,10 @@ while true; do
                         execute_ssh_command "$SCRIPTS_DIRECTORY/setup-new-react-app.sh" "true"
                         ;;
                     1)
-                        execute_ssh_command "$SCRIPTS_DIRECTORY/setup-new-express-server.sh" "true"
+                        execute_ssh_command "$SCRIPTS_DIRECTORY/setup-new-vite-app.sh" "true"
                         ;;
                     2)
-                        execute_ssh_command "$SCRIPTS_DIRECTORY/setup-new-domain.sh" "true"
+                        execute_ssh_command "$SCRIPTS_DIRECTORY/setup-new-express-server.sh" "true"
                         ;;
                 esac
             fi
@@ -336,7 +345,7 @@ while true; do
     elif [ $level1_selection -eq 2 ]; then
         while true; do
             # Level 2 (Remove)
-            reload_options=("React App" "Express Server")
+            reload_options=("React App" "Vite React App" "Express Server")
             navigate_menu 2 "Reload Existing Instance" "reload" "${reload_options[@]}"
             reload_selection=$selected_option
             
@@ -351,6 +360,12 @@ while true; do
                         fi
                         ;;
                     1)
+                        # Level 3 (Rebuild Vite React App)
+                        if ! display_remote_directory 3 "$VITE_APPS_DIRECTORY" "reload" "Rebuild Vite React App"; then
+                            continue
+                        fi
+                        ;;
+                    2)
                         # Level 3 (Restart Express Server)
                         if ! display_remote_directory 3 "$SERVICES_DIRECTORY" "reload" "Restart Express Server"; then
                             continue
@@ -362,7 +377,7 @@ while true; do
     elif [ $level1_selection -eq 3 ]; then
         while true; do
             # Level 2 (View Git Remotes)
-            view_options=("React App" "Express Server")
+            view_options=("React App" "Vite React App" "Express Server")
             navigate_menu 2 "View Git Remotes" "view" "${view_options[@]}"
             view_selection=$selected_option
             
@@ -377,6 +392,12 @@ while true; do
                         fi
                         ;;
                     1)
+                        # Level 3 (View Vite React App Git Remotes)
+                        if ! display_git_remotes 3 "$VITE_APPS_DIRECTORY" "" "Vite React App Git Remotes"; then
+                            continue
+                        fi
+                        ;;
+                    2)
                         # Level 3 (View Express Server Git Remotes)
                         if ! display_git_remotes 3 "$SERVICES_DIRECTORY" "" "Express Server Git Remotes"; then
                             continue

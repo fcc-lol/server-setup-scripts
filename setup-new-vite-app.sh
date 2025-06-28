@@ -4,7 +4,7 @@
 SERVER="root.fcc.lol"
 USER="fcc"
 ADMIN_CONTACT="studio@fcc.lol"
-APPS_DIRECTORY="/home/$USER/react-apps"
+APPS_DIRECTORY="/home/$USER/vite-apps"
 DEFAULT_DOMAIN_FOR_SUBDOMAINS="fcc.lol"
 
 # Set up formatting for use later
@@ -91,8 +91,8 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create public directory at $APPS_DIRECTORY/$APP_ID/public"
 fi
 
-# Create a basic src/App.js file
-sudo touch $APPS_DIRECTORY/$APP_ID/src/App.js
+# Create a basic src/App.jsx file
+sudo touch $APPS_DIRECTORY/$APP_ID/src/App.jsx
 if echo "import React from \"react\";
 import styled from \"styled-components\";
 
@@ -110,10 +110,10 @@ function App() {
 }
 
 export default App;
-" | sudo tee $APPS_DIRECTORY/$APP_ID/src/App.js > /dev/null; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic src/App.js file"
+" | sudo tee $APPS_DIRECTORY/$APP_ID/src/App.jsx > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic src/App.jsx file"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic src/App.js file"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic src/App.jsx file"
 fi
 
 # Create a basic src/index.css
@@ -137,39 +137,43 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic src/index.css file"
 fi
 
-# Create a basic src/index.js
-sudo touch $APPS_DIRECTORY/$APP_ID/src/index.js
+# Create a basic src/main.jsx
+sudo touch $APPS_DIRECTORY/$APP_ID/src/main.jsx
 if echo "import React from \"react\";
 import ReactDOM from \"react-dom/client\";
 import \"./index.css\";
-import App from \"./App\";
+import App from \"./App.jsx\";
 
-const root = ReactDOM.createRoot(document.getElementById(\"root\"));
-root.render(<App />);
-" | sudo tee $APPS_DIRECTORY/$APP_ID/src/index.js > /dev/null; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic src/index.js file"
+ReactDOM.createRoot(document.getElementById(\"root\")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+" | sudo tee $APPS_DIRECTORY/$APP_ID/src/main.jsx > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic src/main.jsx file"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic src/index.js file"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic src/main.jsx file"
 fi
 
-# Create a basic public/index.html
-sudo touch $APPS_DIRECTORY/$APP_ID/public/index.html
+# Create a basic index.html
+sudo touch $APPS_DIRECTORY/$APP_ID/index.html
 if echo "<!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
   <head>
-    <meta charset=\"utf-8\" />
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <meta charset=\"UTF-8\" />
+    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/vite.svg\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
     <title>$APP_NAME</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id=\"root\"></div>
+    <script type=\"module\" src=\"/src/main.jsx\"></script>
   </body>
 </html>
-" | sudo tee $APPS_DIRECTORY/$APP_ID/public/index.html > /dev/null; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic public/index.html file"
+" | sudo tee $APPS_DIRECTORY/$APP_ID/index.html > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic index.html file"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic public/index.html file"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic index.html file"
 fi
 
 # Create a basic public/manifest.json
@@ -215,41 +219,31 @@ fi
 sudo touch $APPS_DIRECTORY/$APP_ID/package.json
 if echo "{
   \"name\": \"$APP_ID\",
-  \"homepage\": \"./\",
-  \"version\": \"0.1.0\",
-  \"private\": false,
+  \"private\": true,
+  \"version\": \"0.0.0\",
+  \"type\": \"module\",
+  \"scripts\": {
+    \"dev\": \"vite\",
+    \"build\": \"vite build\",
+    \"lint\": \"eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0\",
+    \"preview\": \"vite preview\"
+  },
   \"dependencies\": {
-    \"react\": \"^18.3.1\",
-    \"react-dom\": \"^18.3.1\",
-    \"react-scripts\": \"5.0.1\",
+    \"react\": \"^18.2.0\",
+    \"react-dom\": \"^18.2.0\",
     \"styled-components\": \"^6.1.11\"
   },
-  \"scripts\": {
-    \"start\": \"react-scripts start\",
-    \"build\": \"react-scripts build\",
-    \"test\": \"react-scripts test\",
-    \"eject\": \"react-scripts eject\"
-  },
-  \"eslintConfig\": {
-    \"extends\": [
-      \"react-app\",
-      \"react-app/jest\"
-    ]
-  },
-  \"browserslist\": {
-    \"production\": [
-      \">0.2%\",
-      \"not dead\",
-      \"not op_mini all\"
-    ],
-    \"development\": [
-      \"last 1 chrome version\",
-      \"last 1 firefox version\",
-      \"last 1 safari version\"
-    ]
+  \"devDependencies\": {
+    \"@types/react\": \"^18.2.43\",
+    \"@types/react-dom\": \"^18.2.17\",
+    \"@vitejs/plugin-react\": \"^4.2.1\",
+    \"eslint\": \"^8.55.0\",
+    \"eslint-plugin-react\": \"^7.33.2\",
+    \"eslint-plugin-react-hooks\": \"^4.6.0\",
+    \"eslint-plugin-react-refresh\": \"^0.4.5\",
+    \"vite\": \"^5.0.8\"
   }
-}
-" | sudo tee $APPS_DIRECTORY/$APP_ID/package.json > /dev/null; then
+}" | sudo tee $APPS_DIRECTORY/$APP_ID/package.json > /dev/null; then
     echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic package.json file"
 else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic package.json file"
@@ -319,9 +313,9 @@ if echo "<VirtualHost *:80>
     SSLCipherSuite ECDHE+AESGCM:ECDHE+AES256:ECDHE+AES128:!aNULL:!MD5:!DSS
     SSLHonorCipherOrder on
 
-    DocumentRoot $APPS_DIRECTORY/$APP_ID/build
+    DocumentRoot $APPS_DIRECTORY/$APP_ID/dist
     
-    <Directory $APPS_DIRECTORY/$APP_ID/build>
+    <Directory $APPS_DIRECTORY/$APP_ID/dist>
         AllowOverride all
         Require all granted
     </Directory>
@@ -368,7 +362,7 @@ sudo touch $APPS_DIRECTORY/$APP_ID/.gitignore
 if echo '.env
 .DS_Store
 node_modules/
-build/
+dist/
 ' | sudo tee $APPS_DIRECTORY/$APP_ID/.gitignore > /dev/null; then
     echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic gitignore file"
 else
@@ -402,6 +396,58 @@ echo -e \"${BOLD_GREEN}SUCCESS${END_COLOR} Deployed main to $APPS_DIRECTORY/$APP
     echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created post-receive hook"
 else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create post-receive hook"
+fi
+
+# Create a basic vite.svg
+sudo touch $APPS_DIRECTORY/$APP_ID/public/vite.svg
+if echo "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" aria-hidden=\"true\" role=\"img\" class=\"iconify iconify--logos\" width=\"31.88\" height=\"32\" preserveAspectRatio=\"xMidYMid meet\" viewBox=\"0 0 256 257\"><defs><linearGradient id=\"IconifyId1813088fe1fbc01fb466\" x1=\"-.828%\" x2=\"57.636%\" y1=\"7.652%\" y2=\"78.411%\"><stop offset=\"0%\" stop-color=\"#41D1FF\"></stop><stop offset=\"100%\" stop-color=\"#BD34FE\"></stop></linearGradient><linearGradient id=\"IconifyId1813088fe1fbc01fb467\" x1=\"43.376%\" x2=\"50.316%\" y1=\"2.242%\" y2=\"89.03%\"><stop offset=\"0%\" stop-color=\"#FFEA83\"></stop><stop offset=\"8.333%\" stop-color=\"#FFDD35\"></stop><stop offset=\"100%\" stop-color=\"#FFA800\"></stop></linearGradient></defs><path fill=\"url(#IconifyId1813088fe1fbc01fb466)\" d=\"M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z\"></path><path fill=\"url(#IconifyId1813088fe1fbc01fb467)\" d=\"M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z\"></path></svg>" | sudo tee $APPS_DIRECTORY/$APP_ID/public/vite.svg > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic vite.svg file"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic vite.svg file"
+fi
+
+# Create a basic vite.config.js
+sudo touch $APPS_DIRECTORY/$APP_ID/vite.config.js
+if echo "import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
+  }
+})" | sudo tee $APPS_DIRECTORY/$APP_ID/vite.config.js > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic vite.config.js file"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic vite.config.js file"
+fi
+
+# Create a basic .eslintrc.cjs
+sudo touch $APPS_DIRECTORY/$APP_ID/.eslintrc.cjs
+if echo "module.exports = {
+  root: true,
+  env: { browser: true, es2020: true },
+  extends: [
+    'eslint:recommended',
+    '@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+  ],
+  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  settings: { react: { version: '18.2' } },
+  plugins: ['react-refresh'],
+  rules: {
+    'react-refresh/only-export-components': [
+      'warn',
+      { allowConstantExport: true },
+    ],
+  },
+}" | sudo tee $APPS_DIRECTORY/$APP_ID/.eslintrc.cjs > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created basic .eslintrc.cjs file"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic .eslintrc.cjs file"
 fi
 
 # Show confirmation messages
