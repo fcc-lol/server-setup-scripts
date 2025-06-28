@@ -87,12 +87,12 @@
 5. Reload Apache
 
 ## [setup-new-vite-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-vite-app.sh)
-#### Setup a Vite app accessible from a Apache VirtualHost domain or subdomain
+#### Setup a Vite + React app accessible from a Apache VirtualHost domain or subdomain
 
 1. Create root directory for app
 2. Create src directory for app
 3. Create public directory for app
-4. Creates basic files in src/ (main.js, App.vue, style.css)
+4. Creates basic files in src/ (main.jsx, App.jsx, index.css, App.css)
 5. Creates basic files in public/ (vite.svg)
 6. Create a basic README.md
 7. Create a basic package.json
