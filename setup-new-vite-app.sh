@@ -458,3 +458,14 @@ echo -e "${BOLD}*** $APP_ID is now set up! ***${END_COLOR}\n"
 echo -e "* Visit ${BOLD}https://$DOMAIN_NAME${END_COLOR} to see the new site"
 echo -e "\n* Clone this repository and push to origin to deploy: \n${BOLD}git clone $USER@$SERVER:$APPS_DIRECTORY/$APP_ID${END_COLOR}"
 echo -e " "
+
+# Offer to run the git clone command
+read -p "Do you want to clone the repository to your local machine now? (y/N): " CLONE_NOW
+if [[ "$CLONE_NOW" =~ ^[Yy]$ ]]; then
+    echo "Cloning repository..."
+    if git clone "$USER@$SERVER:$APPS_DIRECTORY/$APP_ID"; then
+        echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Repository cloned successfully."
+    else
+        echo -e "${BOLD_RED}FAILED${END_COLOR} Could not clone repository."
+    fi
+fi
