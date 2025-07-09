@@ -106,7 +106,7 @@ const Page = styled.div\`
 \`;
 
 function App() {
-  return <Page>Hello world!</Page>;
+  return <Page>Hello from ${APP_NAME}!</Page>;
 }
 
 export default App;
