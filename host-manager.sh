@@ -137,13 +137,40 @@ navigate_menu() {
 execute_ssh_command() {
     local command=$1
     local interactive=$2
+    local clone_command=""
 
     if [ "$interactive" == "true" ]; then
-      ssh -t $USER@$SERVER "$command"
-      echo " "
-      read -p "$(tput bold)DONE$(tput sgr0) Press enter to continue"
+        # Use a temporary file to capture the output from the remote script
+        local output_file
+        output_file=$(mktemp)
+
+        # Execute the remote script interactively, showing output to the user
+        # and simultaneously capturing it to the temp file.
+        ssh -t "$USER@$SERVER" "$command" | tee "$output_file"
+
+        # After the script finishes, parse the output file for a clone command
+        if [ -s "$output_file" ]; then
+            clone_command=$(grep "CLONE_COMMAND:" "$output_file" | cut -d':' -f2-)
+        fi
+        rm "$output_file"
+
+        # If a clone command was found, offer to run it locally
+        if [ -n "$clone_command" ]; then
+            echo " "
+            read -p "Do you want to clone the repository to your local machine now? (y/N): " CLONE_NOW
+            if [[ "$CLONE_NOW" =~ ^[Yy]$ ]]; then
+                echo "Cloning repository into the current directory..."
+                if eval "$clone_command"; then
+                    echo -e "$(tput setaf 2)$(tput bold)SUCCESS$(tput sgr0) Repository cloned successfully."
+                else
+                    echo -e "$(tput setaf 1)$(tput bold)FAILED$(tput sgr0) Could not clone repository."
+                fi
+            fi
+        fi
+        echo " "
+        read -p "$(tput bold)DONE$(tput sgr0) Press enter to continue"
     else
-      ssh -t $USER@$SERVER "$command"
+        ssh "$USER@$SERVER" "$command"
     fi
 }
 

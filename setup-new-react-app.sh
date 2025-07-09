@@ -412,3 +412,6 @@ echo -e "${BOLD}*** $APP_ID is now set up! ***${END_COLOR}\n"
 echo -e "* Visit ${BOLD}https://$DOMAIN_NAME${END_COLOR} to see the new site"
 echo -e "\n* Clone this repository and push to origin to deploy: \n${BOLD}git clone $USER@$SERVER:$APPS_DIRECTORY/$APP_ID${END_COLOR}"
 echo -e " "
+
+# Output the clone command for the host manager to parse
+echo "CLONE_COMMAND:git clone $USER@$SERVER:$APPS_DIRECTORY/$APP_ID"
