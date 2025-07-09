@@ -1,8 +1,17 @@
 # Server Setup Scripts
 
-## [setup-new-domain.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-domain.sh)
+## [host-manager.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/host-manager.sh)
+#### An interactive TUI for managing your server instances.
+This script provides a menu-driven interface to run the other setup, removal, and maintenance scripts on a remote server via SSH.
+- Create new React, Vite, or Express instances.
+- Remove existing React or Express instances.
+- Rebuild/reload existing React, Vite, or Express instances.
+- View git remote URLs for all instances.
+
+## [setup-new-domain.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-domain.sh)
 #### Setup an Apache VirtualHost for a domain or subdomain serving PHP or HTML
 
+This script is not included in this repository.
 1. Create root directory for domain
 2. Create public html directory
 3. Change permissions for domain directory to specified user
@@ -13,7 +22,7 @@
 8. If Git, set up a hook that deploys any commits made to this repo 
 9. Optional: Set up a bare Git repository in the domain directory
 
-## [setup-new-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-express-server.sh)
+## [setup-new-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-express-server.sh)
 #### Setup an Express server accessible from a Apache VirtualHost subdomain
 
 1. Find an available port
@@ -32,16 +41,16 @@
 14. Commit basic code
 15. Set up a hook that deploys any commits made to this repo
 
-## [restart-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/restart-express-server.sh)
-#### Restart an Express server created by [setup-new-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-express-server.sh)
+## [restart-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/restart-express-server.sh)
+#### Restart an Express server created by [setup-new-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-express-server.sh)
 
 1. Stop node process
 2. Install node modules
 3. Start node process
 4. Reload Apache
 
-## [remove-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/remove-express-server.sh)
-#### Decommission an Express server created by [setup-new-express-server.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-express-server.sh)
+## [remove-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/remove-express-server.sh)
+#### Decommission an Express server created by [setup-new-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-express-server.sh)
 
 1. Disable site in Apache
 2. Delete Apache config file
@@ -49,8 +58,8 @@
 4. Stop node process
 5. Reload Apache
 
-## [setup-new-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-react-app.sh)
-#### Setup a React app accessible from a Apache VirtualHost domain or subdomain
+## [setup-new-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-react-app.sh)
+#### Setup a Create React App accessible from an Apache VirtualHost domain or subdomain
 
 1. Create root directory for app
 2. Create src directory for app
@@ -71,17 +80,52 @@
 17. Commit basic code
 18. Set up a hook that deploys any commits made to this repo 
 
-## [rebuild-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/rebuild-react-app.sh)
-#### Rebuild a React app created by [setup-new-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-react-app.sh)
+## [rebuild-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/rebuild-react-app.sh)
+#### Rebuild a React app created by [setup-new-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-react-app.sh)
 
 1. Install node modules
 2. Build app for production
 3. Reload Apache
    
-## [remove-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/remove-react-app.sh)
-#### Decommission a React app created by [setup-new-react-app.sh](https://github.com/leomancini/server-setup-scripts/blob/main/setup-new-react-app.sh)
+## [remove-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/remove-react-app.sh)
+#### Decommission a React app created by [setup-new-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-react-app.sh)
 
 1. Disable site in Apache
 2. Delete Apache config file
 3. Delete app directory
-5. Reload Apache
+4. Reload Apache
+
+## [setup-new-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+#### Setup a Vite (React) app accessible from an Apache VirtualHost domain or subdomain
+
+1. Create root directory for app
+2. Create src and public directories
+3. Creates basic files in src/ and public/
+4. Create a basic README.md
+5. Create a basic package.json and other config files (vite.config.js, .eslintrc.cjs)
+6. Create a setup-log.json
+7. Change permissions for app directory to specified user
+8. Install node modules
+9. Build app for production
+10. Create a VirtualHost config file that points to the app's dist directory
+11. Enable site in Apache
+12. Reload Apache
+13. Initialize Git repository
+14. Create basic gitignore file
+15. Commit basic code
+16. Set up a hook that deploys any commits made to this repo 
+
+## [rebuild-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/rebuild-vite-app.sh)
+#### Rebuild a Vite app created by [setup-new-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+
+1. Install node modules
+2. Build app for production
+3. Reload Apache
+   
+## [remove-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/remove-vite-app.sh)
+#### Decommission a Vite app created by [setup-new-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-vite-app.sh)
+
+1. Disable site in Apache
+2. Delete Apache config file
+3. Delete app directory
+4. Reload Apache
