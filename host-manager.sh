@@ -146,11 +146,13 @@ execute_ssh_command() {
 
         # Execute the remote script interactively, showing output to the user
         # and simultaneously capturing it to the temp file.
-        ssh -t "$USER@$SERVER" "$command" | tee "$output_file"
+        ssh -t "$USER@$SERVER" "$command" 2>&1 | tee "$output_file"
 
         # After the script finishes, parse the output file for a clone command
+        # The `tr` command removes carriage returns that ssh -t might add.
         if [ -s "$output_file" ]; then
-            clone_command=$(grep "CLONE_COMMAND:" "$output_file" | cut -d':' -f2-)
+            # Clean carriage returns and then grep for the command
+            clone_command=$(tr -d '\r' < "$output_file" | grep "CLONE_COMMAND:" | cut -d':' -f2-)
         fi
         rm "$output_file"
 
@@ -346,7 +348,7 @@ while true; do
     elif [ $level1_selection -eq 1 ]; then
         while true; do
             # Level 2 (Remove)
-            remove_options=("React App" "Express Server")
+            remove_options=("React App" "Vite React App" "Express Server")
             navigate_menu 2 "Remove Existing Instance" "remove" "${remove_options[@]}"
             remove_selection=$selected_option
             
@@ -361,6 +363,12 @@ while true; do
                         fi
                         ;;
                     1)
+                        # Level 3 (Remove Vite React App)
+                        if ! display_remote_directory 3 "$VITE_APPS_DIRECTORY" "remove" "Remove Vite React App"; then
+                            continue
+                        fi
+                        ;;
+                    2)
                         # Level 3 (Remove Express Server)
                         if ! display_remote_directory 3 "$SERVICES_DIRECTORY" "remove" "Remove Express Server"; then
                             continue
