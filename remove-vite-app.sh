@@ -2,36 +2,35 @@
 
 # Set up variables
 USER="fcc"
-SERVICES_DIRECTORY="/home/$USER/services"
+APPS_DIRECTORY="/home/$USER/vite-apps"
 
 # Set up formatting for use later
 BOLD='\e[1m'
 BOLD_RED='\e[1;31m'
 BOLD_GREEN='\e[1;32m'
-BOLD_CYAN='\e[1;36m'
 END_COLOR='\e[0m' # This ends formatting
 
 # Parse CLI arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --service-id) SERVICE_ID="$2"; shift ;;
+        --app-id) APP_ID="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
 done
 
-# Prompt for SERVICE_ID if not set by CLI flag
-if [ -z "$SERVICE_ID" ]; then
-    read -p "Service ID: " SERVICE_ID
+# Prompt for APP_ID if not set by CLI flag
+if [ -z "$APP_ID" ]; then
+    read -p "App ID: " APP_ID
 fi
 
-# Function to clean SERVICE_ID
-clean_service_id() {
+# Function to clean APP_ID
+clean_app_id() {
     echo "$1" | tr -d '\r'
 }
 
-# Clean SERVICE_ID
-SERVICE_ID=$(clean_service_id "$SERVICE_ID")
+# Clean APP_ID
+APP_ID=$(clean_app_id "$APP_ID")
 
 # Prompt for sudo password
 read -s -p "Enter sudo password: " SUDO_PASSWORD
@@ -64,7 +63,7 @@ trap 'kill $SUDO_KEEP_ALIVE_PID' EXIT
 echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Password correct"
 
 # Find the DOMAIN_NAME from setup-log.json
-SETUP_LOG_FILE="$SERVICES_DIRECTORY/$SERVICE_ID/setup-log.json"
+SETUP_LOG_FILE="$APPS_DIRECTORY/$APP_ID/setup-log.json"
 if [ -f "$SETUP_LOG_FILE" ]; then
     DOMAIN_NAME=$(jq -r '.domain' "$SETUP_LOG_FILE" | sed 's|https://||')
     if [ -z "$DOMAIN_NAME" ] || [ "$DOMAIN_NAME" == "null" ]; then
@@ -78,32 +77,25 @@ else
     exit 1
 fi
 
-# Stop node process
-if pkill -f "node.*$SERVICES_DIRECTORY/$SERVICE_ID/" > /dev/null 2>&1; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Stopped node process"
+# Disable site in Apache
+if sudo a2dissite "$DOMAIN_NAME" > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Disabled site in Apache"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot stop node process"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot disable site in Apache"
 fi
 
-# Install node modules
-if cd $SERVICES_DIRECTORY/$SERVICE_ID && npm install --no-save; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Installed node modules"
+# Delete Apache config file
+if sudo rm -f "/etc/apache2/sites-available/$DOMAIN_NAME.conf" && sudo rm -f "/etc/apache2/sites-available/$DOMAIN_NAME-le-ssl.conf"; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Deleted Apache config file"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot install node modules"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot delete Apache config file"
 fi
 
-# Start node process
-if cd "$SERVICES_DIRECTORY/$SERVICE_ID"; then
-    setsid nohup npm run start > ./output.log 2>&1 &
-    NODE_PID=$!
-    
-    if kill -0 $NODE_PID > /dev/null 2>&1; then
-        echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Started node with process ID $NODE_PID"
-    else
-        echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot start node"
-    fi
+# Delete app directory
+if sudo rm -r "$APPS_DIRECTORY/$APP_ID/"; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Deleted app directory"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot change directory to $SERVICES_DIRECTORY/$SERVICE_ID"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot delete app directory"
 fi
 
 # Reload Apache
@@ -113,9 +105,9 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot reload Apache"
 fi
 
-# Show confirmation messages depending on optional steps
+# Show confirmation messages
 echo -e "\n------------------------------------"
 echo -e "--------------- ${BOLD}DONE${END_COLOR} ---------------"
 echo -e "------------------------------------ \n"
-echo -e "${BOLD_CYAN}*** $SERVICE_ID has been restarted! ***${END_COLOR}\n"
-echo -e " "
+echo -e "${BOLD_RED}*** $APP_ID is now removed! ***${END_COLOR}\n"
+echo -e " " 
