@@ -151,8 +151,9 @@ execute_ssh_command() {
         # After the script finishes, parse the output file for a clone command
         # The `tr` command removes carriage returns that ssh -t might add.
         if [ -s "$output_file" ]; then
-            # Clean carriage returns and then grep for the command
-            clone_command=$(tr -d '\r' < "$output_file" | grep "CLONE_COMMAND:" | cut -d':' -f2-)
+            # Clean ANSI color codes and carriage returns, then grep for the command.
+            # This is necessary because `ssh -t` can add many invisible control characters.
+            clone_command=$(sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$output_file" | tr -d '\r' | grep "CLONE_COMMAND:" | cut -d':' -f2-)
         fi
         rm "$output_file"
 
