@@ -369,13 +369,6 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic gitignore file"
 fi
 
-# Commit basic code
-if git add . && git commit -m "Adding basic template" > /dev/null; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Committed initial code to repository"
-else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot initial code to repository"
-fi
-
 # Set up a hook that deploys any commits made to this repo 
 sudo touch $APPS_DIRECTORY/$APP_ID/.git/hooks/post-receive
 sudo chmod +x $APPS_DIRECTORY/$APP_ID/.git/hooks/post-receive
@@ -450,6 +443,13 @@ else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create basic .eslintrc.cjs file"
 fi
 
+# Commit basic code
+if cd $APPS_DIRECTORY/$APP_ID && git add . && git commit -m "Adding basic template" > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Committed initial code to repository"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot commit initial code to repository"
+fi
+
 # Show confirmation messages
 echo -e "\n------------------------------------"
 echo -e "--------------- ${BOLD}DONE${END_COLOR} ---------------"
@@ -458,4 +458,3 @@ echo -e "${BOLD}*** $APP_ID is now set up! ***${END_COLOR}\n"
 echo -e "* Visit ${BOLD}https://$DOMAIN_NAME${END_COLOR} to see the new site"
 echo -e "\n* Clone this repository and push to origin to deploy: \n${BOLD}git clone $USER@$SERVER:$APPS_DIRECTORY/$APP_ID${END_COLOR}"
 echo -e " "
-
