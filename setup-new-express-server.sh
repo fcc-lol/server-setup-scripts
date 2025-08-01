@@ -210,8 +210,8 @@ if echo "<VirtualHost *:80>
 
     # SSL Configuration using Cloudflare Origin CA
     SSLEngine on
-    SSLCertificateFile /etc/ssl/cloudflare/danzaharia.com.pem
-    SSLCertificateKeyFile /etc/ssl/cloudflare/danzaharia.com.key
+    SSLCertificateFile /etc/ssl/cloudflare/fcc.lol.pem
+    SSLCertificateKeyFile /etc/ssl/cloudflare/fcc.lol.key
     
     # SSL Security Settings
     SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
