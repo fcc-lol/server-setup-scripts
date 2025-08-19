@@ -225,6 +225,7 @@ if echo "{
     \"styled-components\": \"^6.1.11\"
   },
   \"scripts\": {
+    \"dev\": \"react-scripts start\",
     \"start\": \"react-scripts start\",
     \"build\": \"react-scripts build\",
     \"test\": \"react-scripts test\",
