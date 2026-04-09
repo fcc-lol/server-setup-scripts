@@ -599,7 +599,7 @@ else
 fi
 
 # Set up GitHub repository
-DEPLOY_KEY_PATH="${GITHUB_DEPLOY_KEY_PATH:-$HOME/.ssh/github_deploy_key}"
+DEPLOY_KEY_PATH="${GITHUB_DEPLOY_KEY_PATH:-$HOME/.ssh/id_ed25519}"
 
 if [ "$GITHUB_PRIVATE" = "true" ]; then
   VISIBILITY="--private"
@@ -666,7 +666,7 @@ if [ -f "$DEPLOY_KEY_PATH" ]; then
     fi
 else
     echo -e "${BOLD_RED}WARNING${END_COLOR} Deploy key not found at $DEPLOY_KEY_PATH"
-    echo "  Set GITHUB_DEPLOY_KEY_PATH env var or place key at ~/.ssh/github_deploy_key"
+    echo "  Set GITHUB_DEPLOY_KEY_PATH env var or place key at ~/.ssh/id_ed25519"
     echo "  Then run: gh secret set SERVER_DEPLOY_KEY --repo $GITHUB_ORG/$APP_ID < \$KEY_PATH"
 fi
 
