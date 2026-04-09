@@ -7,6 +7,7 @@ ADMIN_CONTACT="studio@fcc.lol"
 APPS_DIRECTORY="/home/$USER/full-stack-apps"
 DEFAULT_DOMAIN_FOR_SUBDOMAINS="fcc.lol"
 GITHUB_USER="artemiszephyrfcc"
+GITHUB_ORG="fcc-lol"
 
 # Set up formatting for use later
 BOLD='\e[1m'
@@ -648,9 +649,9 @@ git add .github/
 git commit -m "Add GitHub Actions deploy workflow" > /dev/null
 
 # Create GitHub repo and push
-if gh repo create "$GITHUB_USER/$APP_ID" $VISIBILITY; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created GitHub repo at github.com/$GITHUB_USER/$APP_ID"
-    git remote add origin "git@github.com:$GITHUB_USER/$APP_ID.git"
+if gh repo create "$GITHUB_ORG/$APP_ID" $VISIBILITY; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created GitHub repo at github.com/$GITHUB_ORG/$APP_ID"
+    git remote add origin "git@github.com:$GITHUB_ORG/$APP_ID.git"
     git push -u origin main
 else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create GitHub repo"
@@ -658,7 +659,7 @@ fi
 
 # Set deploy key secret
 if [ -f "$DEPLOY_KEY_PATH" ]; then
-    if gh secret set SERVER_DEPLOY_KEY --repo "$GITHUB_USER/$APP_ID" < "$DEPLOY_KEY_PATH"; then
+    if gh secret set SERVER_DEPLOY_KEY --repo "$GITHUB_ORG/$APP_ID" < "$DEPLOY_KEY_PATH"; then
         echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Set SERVER_DEPLOY_KEY secret"
     else
         echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot set deploy key secret"
@@ -666,7 +667,7 @@ if [ -f "$DEPLOY_KEY_PATH" ]; then
 else
     echo -e "${BOLD_RED}WARNING${END_COLOR} Deploy key not found at $DEPLOY_KEY_PATH"
     echo "  Set GITHUB_DEPLOY_KEY_PATH env var or place key at ~/.ssh/github_deploy_key"
-    echo "  Then run: gh secret set SERVER_DEPLOY_KEY --repo $GITHUB_USER/$APP_ID < \$KEY_PATH"
+    echo "  Then run: gh secret set SERVER_DEPLOY_KEY --repo $GITHUB_ORG/$APP_ID < \$KEY_PATH"
 fi
 
 # Show confirmation messages
@@ -676,7 +677,7 @@ echo -e "------------------------------------ \n"
 echo -e "${BOLD}*** $APP_ID is now set up! ***${END_COLOR}\n"
 echo -e "* Visit ${BOLD}https://$DOMAIN_NAME${END_COLOR} to see the new site"
 echo -e "\n* Clone from GitHub and push to deploy:"
-echo -e "${BOLD}git clone git@github.com:$GITHUB_USER/$APP_ID.git${END_COLOR}"
+echo -e "${BOLD}git clone git@github.com:$GITHUB_ORG/$APP_ID.git${END_COLOR}"
 echo -e "\n* Or clone directly from server and push to deploy:"
 echo -e "${BOLD}git clone $USER@$SERVER:$APPS_DIRECTORY/$APP_ID${END_COLOR}"
 echo -e " "
