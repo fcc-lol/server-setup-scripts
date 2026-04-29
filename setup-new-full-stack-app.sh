@@ -586,7 +586,7 @@ echo "Building app for production"
 npm run build || { echo "Build failed"; exit 1; }
 
 echo "Restarting via PM2"
-if pm2 restart '"$APP_ID"'; then
+if pm2 restart '"$APP_ID"' > /dev/null; then
     pm2 save >/dev/null 2>&1
     echo -e "\e[1;32mSUCCESS\e[0m Deployed '"$APP_ID"'"
 else

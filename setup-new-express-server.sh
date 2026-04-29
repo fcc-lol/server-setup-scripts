@@ -318,9 +318,9 @@ echo "Installing dependencies"
 npm install --no-save || { echo "npm install failed"; exit 1; }
 
 echo "Restarting process with pm2"
-if pm2 restart "$SERVICE_ID"; then
+if pm2 restart "$SERVICE_ID" > /dev/null; then
     echo -e \"${BOLD_GREEN}SUCCESS${END_COLOR} Deployed main to $SERVICES_DIRECTORY/$SERVICE_ID\"
-    pm2 save
+    pm2 save > /dev/null 2>&1
 else
     echo "Failed to restart process with pm2"
     exit 1
