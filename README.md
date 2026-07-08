@@ -40,6 +40,9 @@ This script is not included in this repository.
 13. Create basic gitignore file
 14. Commit basic code
 15. Set up a hook that deploys any commits made to this repo
+16. Create a GitHub Actions deploy workflow
+17. Create a GitHub repo under fcc-lol and push
+18. Set the SERVER_DEPLOY_KEY secret so pushes to main on GitHub deploy automatically
 
 ## [restart-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/restart-express-server.sh)
 #### Restart an Express server created by [setup-new-express-server.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-express-server.sh)
@@ -78,7 +81,10 @@ This script is not included in this repository.
 15. Initialize Git repository
 16. Create basic gitignore file
 17. Commit basic code
-18. Set up a hook that deploys any commits made to this repo 
+18. Set up a hook that deploys any commits made to this repo
+19. Create a GitHub Actions deploy workflow
+20. Create a GitHub repo under fcc-lol and push
+21. Set the SERVER_DEPLOY_KEY secret so pushes to main on GitHub deploy automatically
 
 ## [rebuild-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/rebuild-react-app.sh)
 #### Rebuild a React app created by [setup-new-react-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-react-app.sh)
@@ -113,7 +119,10 @@ This script is not included in this repository.
 13. Initialize Git repository
 14. Create basic gitignore file
 15. Commit basic code
-16. Set up a hook that deploys any commits made to this repo 
+16. Set up a hook that deploys any commits made to this repo
+17. Create a GitHub Actions deploy workflow
+18. Create a GitHub repo under fcc-lol and push
+19. Set the SERVER_DEPLOY_KEY secret so pushes to main on GitHub deploy automatically
 
 ## [rebuild-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/rebuild-vite-app.sh)
 #### Rebuild a Vite app created by [setup-new-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-vite-app.sh)
