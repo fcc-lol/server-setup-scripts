@@ -577,6 +577,10 @@ sudo chown $USER $APPS_DIRECTORY/$APP_ID/.git/hooks/post-receive
 
 if echo '#!/bin/bash
 
+# Load nvm so node/npm/pm2 are available in non-interactive shells
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 cd '"$APPS_DIRECTORY/$APP_ID"' || { echo "Failed to change directory"; exit 1; }
 
 echo "Installing dependencies"
@@ -586,13 +590,18 @@ echo "Building app for production"
 npm run build || { echo "Build failed"; exit 1; }
 
 echo "Restarting via PM2"
-if pm2 restart '"$APP_ID"' > /dev/null; then
-    pm2 save >/dev/null 2>&1
-    echo -e "\e[1;32mSUCCESS\e[0m Deployed '"$APP_ID"'"
-else
-    echo "Failed to restart process with pm2"
-    exit 1
-fi' | sudo tee $APPS_DIRECTORY/$APP_ID/.git/hooks/post-receive > /dev/null; then
+pm2 stop '"$APP_ID"' >/dev/null 2>&1
+# Kill any stale process on the port before starting
+STALE_PID=$(lsof -ti :'"$PORT"' -sTCP:LISTEN 2>/dev/null)
+if [ -n "$STALE_PID" ]; then
+  echo "Killing stale process on port '"$PORT"' (PID $STALE_PID)"
+  kill -9 "$STALE_PID" 2>/dev/null
+  sleep 1
+fi
+pm2 start '"$APP_ID"' >/dev/null 2>&1
+pm2 save >/dev/null 2>&1
+
+echo -e "\e[1;32mSUCCESS\e[0m Deployed '"$APP_ID"'"' | sudo tee $APPS_DIRECTORY/$APP_ID/.git/hooks/post-receive > /dev/null; then
     echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Created post-receive hook"
 else
     echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot create post-receive hook"
@@ -623,7 +632,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

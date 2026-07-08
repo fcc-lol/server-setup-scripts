@@ -10,6 +10,18 @@ FULL_STACK_APPS_DIRECTORY="/home/$USER/full-stack-apps"
 SERVICES_DIRECTORY="/home/$USER/services"
 DOMAINS_DIRECTORY="/home/$USER/domains"
 
+# Cache tput values once to avoid forking on every redraw
+BOLD=$(tput bold)
+SMSO=$(tput smso)
+RESET=$(tput sgr0)
+COLOR_GREEN=$(tput setaf 2)
+COLOR_RED=$(tput setaf 1)
+COLOR_CYAN=$(tput setaf 6)
+COLOR_BLUE=$(tput setaf 4)
+COLOR_MAGENTA=$(tput setaf 5)
+COLOR_WHITE=$(tput setaf 7)
+CLR="\033[K"
+
 # Function to print the menu with minimal updates
 print_menu() {
     local level=$1
@@ -18,69 +30,66 @@ print_menu() {
     local mode=$4
     shift 4
     local options=("$@")
-    
-    echo -e "\033[H\033[J" # Clear the screen
-    
-    echo "$(tput bold)$(tput smso)  $header  $(tput sgr0)"
-    echo " "
-    
+
+    local buf=""
+    buf+="\033[?25l\033[H" # Hide cursor and move to top-left
+
+    buf+="${BOLD}${SMSO}  $header  ${RESET}${CLR}\n"
+    buf+=" ${CLR}\n"
+
     # Determine color based on mode
-    if [ "$mode" == "add" ]; then
-        selected_symbol="+"
-        option_color=$(tput setaf 2) # Green
-    elif [ "$mode" == "remove" ]; then
-        selected_symbol="-"
-        option_color=$(tput setaf 1) # Red
-    elif [ "$mode" == "reload" ]; then
-        selected_symbol="↻"
-        option_color=$(tput setaf 6) # Cyan
-    elif [ "$mode" == "view" ]; then
-        selected_symbol="→"
-        option_color=$(tput setaf 4) # Blue
-    else
-        selected_symbol="→"
-        option_color=$(tput sgr0) # Default color
-    fi
-    
+    local selected_symbol option_color
+    case "$mode" in
+        add)     selected_symbol="+"; option_color="$COLOR_GREEN" ;;
+        remove)  selected_symbol="-"; option_color="$COLOR_RED" ;;
+        reload)  selected_symbol="↻"; option_color="$COLOR_CYAN" ;;
+        view)    selected_symbol="→"; option_color="$COLOR_BLUE" ;;
+        *)       selected_symbol="→"; option_color="$RESET" ;;
+    esac
+
     if [ $level -gt 1 ]; then
         for ((i = 0; i < ${#options[@]}; i++)); do
             if [ $i -eq $selected ]; then
-                echo -e "$option_color$(tput bold)$selected_symbol ${options[i]}$(tput sgr0)"
+                buf+="${option_color}${BOLD}$selected_symbol ${options[i]}${RESET}${CLR}\n"
             else
-                echo -e "$(tput sgr0)  ${options[i]}$(tput sgr0)"
+                buf+="${RESET}  ${options[i]}${RESET}${CLR}\n"
             fi
         done
-        echo " "
+        buf+=" ${CLR}\n"
         if [ $selected -eq ${#options[@]} ]; then
-            echo -e "$(tput setaf 5)$(tput bold)← Back$(tput sgr0)"
+            buf+="${COLOR_MAGENTA}${BOLD}← Back${RESET}${CLR}\n"
         else
-            echo "  Back"
+            buf+="  Back${CLR}\n"
         fi
     else
         for ((i = 0; i < ${#options[@]}; i++)); do
             if [ "${options[i]}" == "" ]; then
-                echo " " # Print a blank line for the unselectable blank option
+                buf+=" ${CLR}\n"
             elif [ $i -eq $selected ]; then
-                if [ "${options[i]}" == "Create New Instance" ]; then
-                    echo -e "$(tput setaf 2)$(tput bold)+ ${options[i]}$(tput sgr0)"
-                elif [ "${options[i]}" == "Remove Existing Instance" ]; then
-                    echo -e "$(tput setaf 1)$(tput bold)- ${options[i]}$(tput sgr0)"
-                elif [ "${options[i]}" == "Reload Existing Instance" ]; then
-                    echo -e "$(tput setaf 6)$(tput bold)↻ ${options[i]}$(tput sgr0)"
-                elif [ "${options[i]}" == "View Git Remotes" ]; then
-                    echo -e "$(tput setaf 4)$(tput bold)→ ${options[i]}$(tput sgr0)"
-                elif [ "${options[i]}" == "Exit" ]; then
-                    echo -e "$(tput setaf 5)$(tput bold)✕ ${options[i]}$(tput sgr0)"
-                else
-                    echo -e "$(tput setaf 5)$(tput bold)→ ${options[i]}$(tput sgr0)"
-                fi
+                case "${options[i]}" in
+                    "Create New Instance")
+                        buf+="${COLOR_GREEN}${BOLD}+ ${options[i]}${RESET}${CLR}\n" ;;
+                    "Remove Existing Instance")
+                        buf+="${COLOR_RED}${BOLD}- ${options[i]}${RESET}${CLR}\n" ;;
+                    "Reload Existing Instance")
+                        buf+="${COLOR_CYAN}${BOLD}↻ ${options[i]}${RESET}${CLR}\n" ;;
+                    "View Git Remotes")
+                        buf+="${COLOR_BLUE}${BOLD}→ ${options[i]}${RESET}${CLR}\n" ;;
+                    "Exit")
+                        buf+="${COLOR_MAGENTA}${BOLD}✕ ${options[i]}${RESET}${CLR}\n" ;;
+                    *)
+                        buf+="${COLOR_MAGENTA}${BOLD}→ ${options[i]}${RESET}${CLR}\n" ;;
+                esac
             else
-                echo -e "$(tput sgr0)  ${options[i]}$(tput sgr0)"
+                buf+="${RESET}  ${options[i]}${RESET}${CLR}\n"
             fi
         done
     fi
-      
-    echo " "
+
+    buf+=" ${CLR}\n"
+    buf+="\033[J\033[?25h" # Clear leftover lines and show cursor
+
+    printf "%b" "$buf"
 }
 
 # Function to handle the arrow key inputs and back option
@@ -142,9 +151,9 @@ execute_ssh_command() {
     if [ "$interactive" == "true" ]; then
       ssh -t $USER@$SERVER "$command"
       echo " "
-      read -p "$(tput bold)DONE$(tput sgr0) Press enter to continue"
+      read -p "${BOLD}DONE${RESET} Press enter to continue"
     else
-      ssh -t $USER@$SERVER "$command"
+      ssh $USER@$SERVER "$command"
     fi
 }
 
@@ -163,7 +172,7 @@ display_remote_directory() {
     if [ -z "$folders" ]; then
         echo "Nothing found in $directory"
         echo " "
-        read -p "$(tput bold)DONE$(tput sgr0) Press enter to continue"
+        read -p "${BOLD}DONE${RESET} Press enter to continue"
         return 1 # Indicate that back was selected
     fi
 
@@ -179,7 +188,7 @@ display_remote_directory() {
 
     navigate_menu $level "$action" "$type" "${options[@]}"
     selected_folder=${options[$selected_option]}
-    
+
     if [ $selected_option -eq ${#options[@]} ]; then
         return 1 # Indicate that back was selected
     else
@@ -236,7 +245,7 @@ display_git_remotes() {
     if [ -z "$folders" ]; then
         echo "Nothing found in $directory"
         echo " "
-        read -p "$(tput bold)DONE$(tput sgr0) Press enter to continue"
+        read -p "${BOLD}DONE${RESET} Press enter to continue"
         return 1 # Indicate that back was selected
     fi
 
@@ -250,37 +259,45 @@ display_git_remotes() {
 
     printf "%s\n" "${options[@]}" >&2
 
-    # Create display options for git remotes
-    local display_options=()
+    # Pre-build display lines for git remotes
+    local display_lines=()
     for option in "${options[@]}"; do
         if [ -n "$option" ]; then
-            # Clean the option name by removing any special characters
             option=$(echo "$option" | tr -d '\r\n' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
             local full_path="$directory/$option"
-            local git_remote="$USER@$SERVER:$full_path"
-            display_options+=("$(tput bold)$(tput setaf 4)$option$(tput sgr0): $(tput setaf 7)$git_remote$(tput sgr0)")
+            local github_remote=$(execute_ssh_command "cd $full_path && git remote get-url origin 2>/dev/null" "false")
+            github_remote=$(echo "$github_remote" | tr -d '\r\n')
+            if [ -n "$github_remote" ]; then
+                display_lines+=("  ${BOLD}${COLOR_BLUE}$option${RESET}: ${COLOR_WHITE}$github_remote${RESET}")
+            else
+                local server_remote="$USER@$SERVER:$full_path"
+                display_lines+=("  ${BOLD}${COLOR_BLUE}$option${RESET}: ${COLOR_WHITE}$server_remote${RESET} ${COLOR_RED}(no GitHub remote)${RESET}")
+            fi
         fi
     done
-    
+
     # Display the git remotes with navigation
     local selected=0
     while true; do
-        echo -e "\033[H\033[J" # Clear the screen
-        echo "$(tput bold)$(tput smso)  $action  $(tput sgr0)"
-        echo " "
-        
-        # Display all git remotes (non-selectable)
-        for display_option in "${display_options[@]}"; do
-            echo -e "  $display_option"
+        local buf=""
+        buf+="\033[?25l\033[H"
+        buf+="${BOLD}${SMSO}  $action  ${RESET}${CLR}\n"
+        buf+=" ${CLR}\n"
+
+        for display_line in "${display_lines[@]}"; do
+            buf+="${display_line}${CLR}\n"
         done
-        
-        echo " "
+
+        buf+=" ${CLR}\n"
         if [ $selected -eq 0 ]; then
-            echo -e "$(tput setaf 5)$(tput bold)← Back$(tput sgr0)"
+            buf+="${COLOR_MAGENTA}${BOLD}← Back${RESET}${CLR}\n"
         else
-            echo "  Back"
+            buf+="  Back${CLR}\n"
         fi
-        echo " "
+        buf+=" ${CLR}\n"
+        buf+="\033[J\033[?25h"
+
+        printf "%b" "$buf"
 
         read -rsn1 input
         if [[ $input == $'\x1b' ]]; then
@@ -290,7 +307,7 @@ display_git_remotes() {
             break
         fi
     done
-    
+
     return 1 # Always return 1 to go back since this is just for viewing
 }
 
@@ -308,7 +325,7 @@ while true; do
             setup_options=("React App" "Vite React App" "Express Server" "Full Stack App")
             navigate_menu 2 "Create New Instance" "add" "${setup_options[@]}"
             setup_selection=$selected_option
-            
+
             if [ $setup_selection -eq ${#setup_options[@]} ]; then
                 break
             else
@@ -334,7 +351,7 @@ while true; do
             remove_options=("React App" "Vite React App" "Express Server" "Full Stack App")
             navigate_menu 2 "Remove Existing Instance" "remove" "${remove_options[@]}"
             remove_selection=$selected_option
-            
+
             if [ $remove_selection -eq ${#remove_options[@]} ]; then
                 break
             else
@@ -368,11 +385,11 @@ while true; do
         done
     elif [ $level1_selection -eq 2 ]; then
         while true; do
-            # Level 2 (Remove)
+            # Level 2 (Reload)
             reload_options=("React App" "Vite React App" "Express Server" "Full Stack App")
             navigate_menu 2 "Reload Existing Instance" "reload" "${reload_options[@]}"
             reload_selection=$selected_option
-            
+
             if [ $reload_selection -eq ${#reload_options[@]} ]; then
                 break
             else
@@ -410,7 +427,7 @@ while true; do
             view_options=("React App" "Vite React App" "Express Server" "Full Stack App")
             navigate_menu 2 "View Git Remotes" "view" "${view_options[@]}"
             view_selection=$selected_option
-            
+
             if [ $view_selection -eq ${#view_options[@]} ]; then
                 break
             else

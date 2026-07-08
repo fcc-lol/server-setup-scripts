@@ -3,10 +3,10 @@
 ## [host-manager.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/host-manager.sh)
 #### An interactive TUI for managing your server instances.
 This script provides a menu-driven interface to run the other setup, removal, and maintenance scripts on a remote server via SSH.
-- Create new React, Vite, or Express instances.
-- Remove existing React or Express instances.
-- Rebuild/reload existing React, Vite, or Express instances.
-- View git remote URLs for all instances.
+- Create new React, Vite, Express, or Full Stack instances.
+- Remove existing React, Vite, Express, or Full Stack instances.
+- Rebuild/reload existing React, Vite, Express, or Full Stack instances.
+- View git remote URLs (GitHub origin when available) for all instances.
 
 ## [setup-new-domain.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-domain.sh)
 #### Setup an Apache VirtualHost for a domain or subdomain serving PHP or HTML
@@ -123,6 +123,24 @@ This script is not included in this repository.
 17. Create a GitHub Actions deploy workflow
 18. Create a GitHub repo under fcc-lol and push
 19. Set the SERVER_DEPLOY_KEY secret so pushes to main on GitHub deploy automatically
+
+## [restart-full-stack-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/restart-full-stack-app.sh)
+#### Restart a Full Stack app created by [setup-new-full-stack-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-full-stack-app.sh)
+
+1. Install node modules
+2. Build app for production
+3. Kill any stale process on the port
+4. Restart via PM2
+5. Reload Apache
+
+## [remove-full-stack-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/remove-full-stack-app.sh)
+#### Decommission a Full Stack app created by [setup-new-full-stack-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-full-stack-app.sh)
+
+1. Stop and remove from PM2
+2. Disable site in Apache
+3. Delete Apache config file
+4. Delete app directory
+5. Reload Apache
 
 ## [rebuild-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/rebuild-vite-app.sh)
 #### Rebuild a Vite app created by [setup-new-vite-app.sh](https://github.com/fcc-lol/server-setup-scripts/blob/main/setup-new-vite-app.sh)

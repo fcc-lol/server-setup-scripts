@@ -2,13 +2,12 @@
 
 # Set up variables
 USER="fcc"
-SERVICES_DIRECTORY="/home/$USER/services"
+APPS_DIRECTORY="/home/$USER/full-stack-apps"
 
 # Set up formatting for use later
 BOLD='\e[1m'
 BOLD_RED='\e[1;31m'
 BOLD_GREEN='\e[1;32m'
-BOLD_CYAN='\e[1;36m'
 END_COLOR='\e[0m' # This ends formatting
 
 # Load nvm so node/npm/pm2 are available in non-interactive shells
@@ -18,24 +17,24 @@ export NVM_DIR="/home/$USER/.nvm"
 # Parse CLI arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --service-id) SERVICE_ID="$2"; shift ;;
+        --app-id) APP_ID="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
 done
 
-# Prompt for SERVICE_ID if not set by CLI flag
-if [ -z "$SERVICE_ID" ]; then
-    read -p "Service ID: " SERVICE_ID
+# Prompt for APP_ID if not set by CLI flag
+if [ -z "$APP_ID" ]; then
+    read -p "App ID: " APP_ID
 fi
 
-# Function to clean SERVICE_ID
-clean_service_id() {
+# Function to clean APP_ID
+clean_app_id() {
     echo "$1" | tr -d '\r'
 }
 
-# Clean SERVICE_ID
-SERVICE_ID=$(clean_service_id "$SERVICE_ID")
+# Clean APP_ID
+APP_ID=$(clean_app_id "$APP_ID")
 
 # Prompt for sudo password
 read -s -p "Enter sudo password: " SUDO_PASSWORD
@@ -68,7 +67,7 @@ trap 'kill $SUDO_KEEP_ALIVE_PID' EXIT
 echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Password correct"
 
 # Find the DOMAIN_NAME from setup-log.json
-SETUP_LOG_FILE="$SERVICES_DIRECTORY/$SERVICE_ID/setup-log.json"
+SETUP_LOG_FILE="$APPS_DIRECTORY/$APP_ID/setup-log.json"
 if [ -f "$SETUP_LOG_FILE" ]; then
     DOMAIN_NAME=$(jq -r '.domain' "$SETUP_LOG_FILE" | sed 's|https://||')
     if [ -z "$DOMAIN_NAME" ] || [ "$DOMAIN_NAME" == "null" ]; then
@@ -82,39 +81,33 @@ else
     exit 1
 fi
 
-# Install node modules
-if cd $SERVICES_DIRECTORY/$SERVICE_ID && npm install --no-save; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Installed node modules"
+# Stop and delete pm2 process
+if pm2 delete "$APP_ID"; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Stopped and removed $APP_ID from pm2"
+    pm2 save
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot install node modules"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot stop or remove $APP_ID from pm2"
 fi
 
-# Build if a build script exists
-if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts.build ? 0 : 1)" 2>/dev/null; then
-    if npm run build; then
-        echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Built for production"
-    else
-        echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot build for production"
-    fi
-fi
-
-# Kill any stale process on the port before restarting
-PORT=$(jq -r '.port' "$SETUP_LOG_FILE")
-if [ -n "$PORT" ] && [ "$PORT" != "null" ]; then
-    STALE_PID=$(lsof -ti :$PORT -sTCP:LISTEN 2>/dev/null)
-    if [ -n "$STALE_PID" ]; then
-        echo "Killing stale process on port $PORT (PID $STALE_PID)"
-        kill -9 "$STALE_PID" 2>/dev/null
-        sleep 1
-    fi
-fi
-
-# Restart via PM2
-pm2 stop "$SERVICE_ID" 2>/dev/null
-if pm2 start "$SERVICE_ID" && pm2 save; then
-    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Restarted $SERVICE_ID via PM2"
+# Disable site in Apache
+if sudo a2dissite $DOMAIN_NAME > /dev/null; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Disabled site in Apache"
 else
-    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot restart $SERVICE_ID via PM2"
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot disable site in Apache"
+fi
+
+# Delete Apache config file
+if sudo rm -f /etc/apache2/sites-available/$DOMAIN_NAME.conf && sudo rm -f /etc/apache2/sites-available/$DOMAIN_NAME-le-ssl.conf; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Deleted Apache config files"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot delete Apache config files"
+fi
+
+# Delete app directory
+if sudo rm -r $APPS_DIRECTORY/$APP_ID/; then
+    echo -e "${BOLD_GREEN}SUCCESS${END_COLOR} Deleted app directory"
+else
+    echo -e "${BOLD_RED}FAILED${END_COLOR} Cannot delete app directory"
 fi
 
 # Reload Apache
@@ -128,5 +121,5 @@ fi
 echo -e "\n------------------------------------"
 echo -e "--------------- ${BOLD}DONE${END_COLOR} ---------------"
 echo -e "------------------------------------ \n"
-echo -e "${BOLD_CYAN}*** $SERVICE_ID has been restarted! ***${END_COLOR}\n"
+echo -e "${BOLD_RED}*** $APP_ID is now removed! ***${END_COLOR}\n"
 echo -e " "
